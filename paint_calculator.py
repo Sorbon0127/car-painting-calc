@@ -27,31 +27,34 @@ class PaintCalculator:
         pass
     
     
+    def calculate_cost(self, part, color, discount=0):
+        """
+        Расчитывает стоимость окраски детали автомобиля
+
+        Args:
+            part (str): Название детали
+            color (str): Цвет
+            discount (float): Скидка в процентах (0-100)
+
+        Returns:
+            float: Стоимость окраски в рублях
+        """
+        if not 0 <= discount <= 100:
+            raise ValueError("Ошибка: Скидка должна быть от 0 до 100 процентов")
+
+        part_lower, color_lower = self.validate_input(part, color)
+
+        part_coef = self.PART_COEFFICIENTS[part_lower]
+        color_coef = self.COLOR_COEFFICIENTS[color_lower]
+
+        cost = self.BASE_COST * part_coef * color_coef
+        cost = cost * (1 - discount / 100)
+
+        return cost
+ 
     
     
 
-    def calculate_cost(self, part, color):
-        """Расчитывает стоимость окраски детали"""
-        if not part or not color:
-            raise ValueError("Деталь и цвет не должны быть пустыми")
-        
-        part_lower = part.lower().strip()
-        color_lower = color.lower().strip()
-        
-        if part_lower not in self.PART_COEFFICIENTS:
-            available = ", ".join(self.PART_COEFFICIENTS.keys())
-            raise ValueError(f"Неизвестная деталь: {part}\nДоступные: {available}")
-        
-        if color_lower not in self.COLOR_COEFFICIENTS:
-            available = ", ".join(self.COLOR_COEFFICIENTS.keys())
-            raise ValueError(f"Неизвестный цвет: {color}\nДоступные: {available}")
-        
-        part_coef = self.PART_COEFFICIENTS[part_lower]
-        color_coef = self.COLOR_COEFFICIENTS[color_lower]
-        
-        cost = self.BASE_COST * part_coef * color_coef
-        return cost
-    
     def get_available_parts(self):
         """Возвращает список доступных деталей"""
         return list(self.PART_COEFFICIENTS.keys())
