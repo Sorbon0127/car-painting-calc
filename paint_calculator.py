@@ -26,6 +26,10 @@ class PaintCalculator:
     def __init__(self):
         pass
     
+    
+    
+    
+
     def calculate_cost(self, part, color):
         """Расчитывает стоимость окраски детали"""
         if not part or not color:
