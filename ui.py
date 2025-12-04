@@ -1,79 +1,64 @@
-from paint_calculator import PaintCalculator
-
-
-class PaintUI:
-    """Интерфейс для работы с калькулятором"""
-
+class PaintCalculator:
+    """Калькулятор стоимости окраски деталей автомобиля"""
+    
+    # Коэффициенты по цветам
+    COLOR_COEFFICIENTS = {
+        "белый": 1.0,
+        "синий": 1.0,
+        "жёлтый": 1.1,
+        "красный": 1.0,
+        "перламутровый": 1.2,
+        "серый металлик": 1.3
+    }
+    
+    # Коэффициенты по деталям
+    PART_COEFFICIENTS = {
+        "капот": 1.0,
+        "передняя дверь": 1.2,
+        "задняя дверь": 1.1,
+        "передний бампер": 1.0,
+        "задний бампер": 1.0,
+        "крыша": 1.1
+    }
+    
+    BASE_COST = 12000  # Базовая стоимость
+    
     def __init__(self):
-        self.calculator = PaintCalculator()
+        pass
+    
+    
+    def calculate_cost(self, part, color, discount=0):
+        """
+        Расчитывает стоимость окраски детали автомобиля
 
-    def display_menu(self):
-        """Показывает главное меню"""
-        print("\n" + "=" * 50)
-        print("КАЛЬКУЛЯТОР СТОИМОСТИ ОКРАСКИ АВТОМОБИЛЯ")
-        print("=" * 50)
-        print("1. Рассчитать стоимость")
-        print("2. Показать доступные детали")
-        print("3. Показать доступные цвета")
-        print("4. Выход")
-        print("=" * 50)
+        Args:
+            part (str): Название детали
+            color (str): Цвет
+            discount (float): Скидка в процентах (0-100)
 
-    def show_parts(self):
-        """Показывает доступные детали"""
-        parts = self.calculator.get_available_parts()
-        print("\nДоступные детали:")
-        for i, part in enumerate(parts, 1):
-            print(f"  {i}. {part}")
+        Returns:
+            float: Стоимость окраски в рублях
+        """
+        if not 0 <= discount <= 100:
+            raise ValueError("Ошибка: Скидка должна быть от 0 до 100 процентов")
 
-    def show_colors(self):
-        """Показывает доступные цвета"""
-        colors = self.calculator.get_available_colors()
-        print("\nДоступные цвета:")
-        for i, color in enumerate(colors, 1):
-            print(f"  {i}. {color}")
+        part_lower, color_lower = self.validate_input(part, color)
 
-    def calculate_and_display(self):
-        """Расчитывает и выводит стоимость"""
-        try:
-            print("\n--- Расчёт стоимости окраски ---")
+        part_coef = self.PART_COEFFICIENTS[part_lower]
+        color_coef = self.COLOR_COEFFICIENTS[color_lower]
 
-            self.show_parts()
-            part = input("\nВведите название детали: ").strip()
+        cost = self.BASE_COST * part_coef * color_coef
+        cost = cost * (1 - discount / 100)
 
-            self.show_colors()
-            color = input("\nВведите цвет: ").strip()
+        return cost
+ 
+    
+    
 
-            discount_str = input(
-                "\nВведите скидку в процентах (0-100, можно оставить пустым): "
-            ).strip()
-            discount = float(discount_str) if discount_str else 0.0
-
-            cost = self.calculator.calculate_cost(part, color, discount)
-
-            print(
-                f"\n✓ Стоимость окраски {part} в цвет '{color}' "
-                f"со скидкой {discount}%: {cost:,.2f} руб."
-            )
-
-        except ValueError as e:
-            print(f"\n✗ Ошибка: {e}")
-        except Exception as e:
-            print(f"\n✗ Непредвиденная ошибка: {e}")
-
-    def run(self):
-        """Главный цикл приложения"""
-        while True:
-            self.display_menu()
-            choice = input("Выберите опцию (1-4): ").strip()
-
-            if choice == "1":
-                self.calculate_and_display()
-            elif choice == "2":
-                self.show_parts()
-            elif choice == "3":
-                self.show_colors()
-            elif choice == "4":
-                print("\nДо свидания!")
-                break
-            else:
-                print("\n✗ Неверный выбор. Попробуйте снова.")
+    def get_available_parts(self):
+        """Возвращает список доступных деталей"""
+        return list(self.PART_COEFFICIENTS.keys())
+    
+    def get_available_colors(self):
+        """Возвращает список доступных цветов"""
+        return list(self.COLOR_COEFFICIENTS.keys())
